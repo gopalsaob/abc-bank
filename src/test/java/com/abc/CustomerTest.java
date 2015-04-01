@@ -9,8 +9,8 @@ public class CustomerTest {
     @Test //Test customer statement generation
     public void testCustomerStatementForMultiAccounts(){
         Customer henry = new Customer("Henry");
-        Account checkingAccount = openAccount(henry, Account.CHECKING);
-        Account savingsAccount = openAccount(henry, Account.SAVINGS);
+        Account checkingAccount = openAccount(henry, AccountType.CHECKING);
+        Account savingsAccount = openAccount(henry, AccountType.SAVINGS);
 
         checkingAccount.deposit(100.0);
         savingsAccount.deposit(4000.0);
@@ -32,20 +32,20 @@ public class CustomerTest {
 
     @Test
     public void testCustomerStatementForCustomerHavingMaxSavingsAccount() {
-        verifyCustomerStatement(Account.MAXI_SAVINGS, "Maxi Savings Account");
+        verifyCustomerStatement(AccountType.MAXI_SAVINGS, "Maxi Savings Account");
     }
 
     @Test
     public void testCustomerStatementForCustomerHavingCheckingAccount() {
-        verifyCustomerStatement(Account.CHECKING, "Checking Account");
+        verifyCustomerStatement(AccountType.CHECKING, "Checking Account");
     }
 
     @Test
     public void testCustomerStatementForCustomerHavingSavingsAccount() {
-        verifyCustomerStatement(Account.SAVINGS, "Savings Account");
+        verifyCustomerStatement(AccountType.SAVINGS, "Savings Account");
     }
 
-    private void verifyCustomerStatement(int accountType, String accountNameInStatement) {
+    private void verifyCustomerStatement(AccountType accountType, String accountNameInStatement) {
         Customer henry = new Customer("Henry");
         Account account = openAccount(henry, accountType);
         account.deposit(100.0);
@@ -61,21 +61,19 @@ public class CustomerTest {
     @Test
     public void testOneAccount() {
         Customer oscar = new Customer("Oscar");
-        openAccount(oscar, Account.SAVINGS);
+        openAccount(oscar, AccountType.SAVINGS);
         assertEquals(1, oscar.getNumberOfAccounts());
     }
 
     @Test
     public void testTwoAccount() {
         Customer oscar = new Customer("Oscar");
-        openAccount(oscar, Account.SAVINGS);
-        openAccount(oscar, Account.CHECKING);
+        openAccount(oscar, AccountType.SAVINGS);
+        openAccount(oscar, AccountType.CHECKING);
         assertEquals(2, oscar.getNumberOfAccounts());
     }
 
-    private Account openAccount(Customer customer, int accountType) {
-        Account account = new Account(accountType);
-        customer.openAccount(account);
-        return account;
+    private Account openAccount(Customer customer, AccountType accountType) {
+        return customer.openAccount(accountType);
     }
 }

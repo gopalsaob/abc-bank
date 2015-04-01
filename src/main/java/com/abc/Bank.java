@@ -15,16 +15,21 @@ public class Bank {
     }
 
     public String customerSummary() {
-        String summary = "Customer Summary";
+        StringBuilder summary = new StringBuilder("Customer Summary");
         for (Customer c : customers)
-            summary += "\n - " + c.getName() + " (" + format(c.getNumberOfAccounts(), "account") + ")";
-        return summary;
+            summary.append(String.format("\n - %s (%s)", c.getName(), format(c.getNumberOfAccounts(), "account")));
+        return summary.toString();
     }
 
-    //Make sure correct plural of word is created based on the number passed in:
-    //If number passed in is 1 just return the word otherwise add an 's' at the end
     private String format(int number, String word) {
-        return number + " " + (number == 1 ? word : word + "s");
+        return String.format("%d %s", number, addPluralToWordBasedOnNumber(number, word));
+    }
+
+    private String addPluralToWordBasedOnNumber(int number, String word) {
+        if (number == 1) {
+            return word;
+        }
+        return word + "s";
     }
 
     public double totalInterestPaid() {
@@ -32,15 +37,5 @@ public class Bank {
         for(Customer c: customers)
             total += c.totalInterestEarned();
         return total;
-    }
-
-    public String getFirstCustomer() {
-        try {
-            customers = null;
-            return customers.get(0).getName();
-        } catch (Exception e){
-            e.printStackTrace();
-            return "Error";
-        }
     }
 }

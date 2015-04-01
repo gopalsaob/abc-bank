@@ -18,9 +18,10 @@ public class Customer {
         return name;
     }
 
-    public Customer openAccount(Account account) {
+    public Account openAccount(AccountType accountType) {
+        Account account = Account.createAccount(accountType);
         accounts.add(account);
-        return this;
+        return account;
     }
 
     public int getNumberOfAccounts() {
@@ -35,36 +36,21 @@ public class Customer {
     }
 
     public String getStatement() {
-        String statement = null;
-        statement = "Statement for " + name + "\n";
+        StringBuilder statement = new StringBuilder(String.format("Statement for %s\n", name));
         double total = 0.0;
         for (Account a : accounts) {
-            statement += "\n" + statementForAccount(a) + "\n";
+            statement.append(String.format("\n%s\n", statementForAccount(a)));
             total += a.sumTransactions();
         }
-        statement += "\nTotal In All Accounts " + toDollars(total);
-        return statement;
+        statement.append(String.format("\nTotal In All Accounts %s", toDollars(total)));
+        return statement.toString();
     }
 
-    private String statementForAccount(Account a) {
-        String s = "";
-
-       //Translate to pretty account type
-        switch(a.getAccountType()){
-            case Account.CHECKING:
-                s += "Checking Account\n";
-                break;
-            case Account.SAVINGS:
-                s += "Savings Account\n";
-                break;
-            case Account.MAXI_SAVINGS:
-                s += "Maxi Savings Account\n";
-                break;
-        }
-
+    private String statementForAccount(Account account) {
+        String s = account.getAccountType().getName() + "\n";
         //Now total up all the transactions
         double total = 0.0;
-        for (Transaction t : a.transactions) {
+        for (Transaction t : account.transactions) {
             s += "  " + (t.amount < 0 ? "withdrawal" : "deposit") + " " + toDollars(t.amount) + "\n";
             total += t.amount;
         }

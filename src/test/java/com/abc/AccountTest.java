@@ -10,7 +10,7 @@ public class AccountTest {
 
     @Before
     public void setupAccount() {
-        account = new Account(Account.CHECKING);
+        account = Account.createAccount(AccountType.CHECKING);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -33,7 +33,6 @@ public class AccountTest {
         account.withdraw(-1);
     }
 
-    @Ignore
     @Test(expected = IllegalArgumentException.class)
     public void testWithdrawalAmountIsGreaterThanAccountBalance() {
         account.withdraw(1);
