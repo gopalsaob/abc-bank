@@ -1,4 +1,7 @@
-package com.abc;
+package com.abc.account.domain;
+
+import com.abc.account.type.AccountType;
+import com.abc.account.transaction.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;

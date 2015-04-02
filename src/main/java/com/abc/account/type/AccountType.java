@@ -1,4 +1,4 @@
-package com.abc;
+package com.abc.account.type;
 
 public enum AccountType {
 

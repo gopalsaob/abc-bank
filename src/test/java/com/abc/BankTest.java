@@ -1,5 +1,6 @@
 package com.abc;
 
+import com.abc.account.type.AccountType;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.assertThat;
@@ -32,15 +33,14 @@ public class BankTest {
     @Test
     public void customerSummaryForCustomerWithTwoAccounts() {
         Customer john = openCheckingAccountForCustomerHavingName("John");
-        openAccount(john, AccountType.SAVINGS);
+        john.openAccount(AccountType.SAVINGS);
         assertEquals("Customer Summary\n - John (2 accounts)", bank.customerSummary());
     }
 
     @Test
     public void checkingAccountInterestEarned() {
         int amount = 100;
-        Account account = openAccountOfType(AccountType.CHECKING);
-        account.deposit(amount);
+        openAccountOfType(AccountType.CHECKING, amount);
         assertThat(bank.totalInterestPaid(), is(amount * 0.001));
     }
 
@@ -53,16 +53,14 @@ public class BankTest {
     @Test
     public void testSavingsAccountInterestEarnedWhenAmountIsLessThanThousandAndGreaterThanZero() {
         int amount = 500;
-        Account account = openAccountOfType(AccountType.SAVINGS);
-        account.deposit(amount);
+        openAccountOfType(AccountType.SAVINGS, amount);
         assertThat(bank.totalInterestPaid(), is(amount * 0.001));
     }
 
     @Test
     public void savingsAccountInterestEarnedWhenAmountIsGreaterThanThousand() {
         int amount = 1500;
-        Account account = openAccountOfType(AccountType.SAVINGS);
-        account.deposit(amount);
+        openAccountOfType(AccountType.SAVINGS, amount);
         assertThat(bank.totalInterestPaid(), is(1000 * 0.001 + (amount - 1000) * 0.002));
     }
 
@@ -75,42 +73,42 @@ public class BankTest {
     @Test
     public void testMaxiSavingsAccountInterestEarnedWhenAmountIsGreaterThanTwoThousand() {
         int amount = 3000;
-        Account account = openAccountOfType(AccountType.MAXI_SAVINGS);
-        account.deposit(amount);
+        openAccountOfType(AccountType.MAXI_SAVINGS, amount);
         assertThat(bank.totalInterestPaid(), is(1000 * 0.02 + 1000 * 0.05 + (amount - 2000) * 0.1));
     }
 
     @Test
     public void testMaxiSavingsAccountInterestEarnedWhenAmountIsLessThanTwoThousand() {
         int amount = 1500;
-        Account account = openAccountOfType(AccountType.MAXI_SAVINGS);
-        account.deposit(amount);
+        openAccountOfType(AccountType.MAXI_SAVINGS, amount);
         assertThat(bank.totalInterestPaid(), is(1000 * 0.02 + (amount - 1000) * 0.05));
     }
 
     @Test
     public void testMaxiSavingsAccountInterestEarnedWhenAmountIsLessThanOneThousand() {
         int amount = 500;
-        Account account = openAccountOfType(AccountType.MAXI_SAVINGS);
-        account.deposit(amount);
+        openAccountOfType(AccountType.MAXI_SAVINGS, amount);
         assertThat(bank.totalInterestPaid(), is(amount * 0.02));
     }
 
-    private Account openAccountOfType(AccountType accountType) {
+    private void openAccountOfType(AccountType accountType, double initialDeposit) {
         Customer bill = new Customer("Bill");
-        Account account = openAccount(bill, accountType);
+        bill.openAccount(accountType, initialDeposit);
         bank.addCustomer(bill);
-        return account;
+    }
+
+    private void openAccountOfType(AccountType accountType) {
+        openAccount(accountType, "Bill");
     }
 
     private Customer openCheckingAccountForCustomerHavingName(String customerName) {
-        Customer customer = new Customer(customerName);
-        openAccount(customer, AccountType.CHECKING);
-        bank.addCustomer(customer);
-        return customer;
+        return openAccount(AccountType.CHECKING, customerName);
     }
 
-    private Account openAccount(Customer customer, AccountType accountType) {
-        return customer.openAccount(accountType);
+    private Customer openAccount(AccountType accountType, String customerName) {
+        Customer customer = new Customer(customerName);
+        customer.openAccount(accountType);
+        bank.addCustomer(customer);
+        return customer;
     }
 }

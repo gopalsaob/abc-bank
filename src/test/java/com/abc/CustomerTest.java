@@ -1,5 +1,6 @@
 package com.abc;
 
+import com.abc.account.type.AccountType;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -9,12 +10,9 @@ public class CustomerTest {
     @Test //Test customer statement generation
     public void testCustomerStatementForMultiAccounts(){
         Customer henry = new Customer("Henry");
-        Account checkingAccount = openAccount(henry, AccountType.CHECKING);
-        Account savingsAccount = openAccount(henry, AccountType.SAVINGS);
-
-        checkingAccount.deposit(100.0);
-        savingsAccount.deposit(4000.0);
-        savingsAccount.withdraw(200.0);
+        henry.openAccount(AccountType.CHECKING, 100.0);
+        int savingsAccountIndex = henry.openAccount(AccountType.SAVINGS, 4000.0);
+        henry.withDrawFromAccount(savingsAccountIndex, 200.0);
 
         assertEquals("Statement for Henry\n" +
                 "\n" +
@@ -47,8 +45,7 @@ public class CustomerTest {
 
     private void verifyCustomerStatement(AccountType accountType, String accountNameInStatement) {
         Customer henry = new Customer("Henry");
-        Account account = openAccount(henry, accountType);
-        account.deposit(100.0);
+        henry.openAccount(accountType, 100.0);
         assertEquals("Statement for Henry\n" +
                 "\n" +
                 accountNameInStatement + "\n" +
@@ -61,19 +58,72 @@ public class CustomerTest {
     @Test
     public void testOneAccount() {
         Customer oscar = new Customer("Oscar");
-        openAccount(oscar, AccountType.SAVINGS);
+        oscar.openAccount(AccountType.SAVINGS);
         assertEquals(1, oscar.getNumberOfAccounts());
     }
 
     @Test
     public void testTwoAccount() {
-        Customer oscar = new Customer("Oscar");
-        openAccount(oscar, AccountType.SAVINGS);
-        openAccount(oscar, AccountType.CHECKING);
+        Customer oscar = createTwoAccountCustomer();
         assertEquals(2, oscar.getNumberOfAccounts());
     }
 
-    private Account openAccount(Customer customer, AccountType accountType) {
-        return customer.openAccount(accountType);
+    @Test(expected = IllegalArgumentException.class)
+    public void testDepositWhenIllegalAccountId() {
+        Customer oscar = new Customer("Oscar");
+        oscar.openAccount(AccountType.SAVINGS);
+        oscar.depositToAccount(-1, 20);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testWithdrawalWhenIllegalAccountId() {
+        Customer oscar = new Customer("Oscar");
+        oscar.openAccount(AccountType.SAVINGS, 20);
+        oscar.withDrawFromAccount(-1, 10);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testTransferWhenFromIndexIsIllegal() {
+        Customer oscar = createTwoAccountCustomer();
+        oscar.transfer(-1, 1, 20);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testTransferWhenToIndexIsIllegal() {
+        Customer oscar = createTwoAccountCustomer();
+        oscar.transfer(0, 2, 20);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testTransferToSameAccount() {
+        Customer oscar = createTwoAccountCustomer();
+        oscar.transfer(0, 0, 20);
+    }
+
+    @Test
+    public void testTransfer() {
+        Customer oscar = new Customer("Oscar");
+        oscar.openAccount(AccountType.SAVINGS, 50);
+        oscar.openAccount(AccountType.CHECKING);
+        oscar.transfer(0, 1, 20);
+        assertEquals("Statement for Oscar\n" +
+                "\n" +
+                "Savings Account\n" +
+                "  deposit $50.00\n" +
+                "  withdrawal $20.00\n" +
+                "Total $30.00\n" +
+                "\n" +
+                "Checking Account\n" +
+                "  deposit $20.00\n" +
+                "Total $20.00\n" +
+                "\n" +
+                "Total In All Accounts $50.00", oscar.getStatement());
+    }
+
+    private Customer createTwoAccountCustomer() {
+        Customer oscar = new Customer("Oscar");
+        oscar.openAccount(AccountType.SAVINGS);
+        oscar.openAccount(AccountType.CHECKING);
+        return oscar;
     }
 }

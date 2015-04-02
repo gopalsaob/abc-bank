@@ -1,7 +1,8 @@
-package com.abc;
+package com.abc.account;
 
+import com.abc.account.domain.Account;
+import com.abc.account.type.AccountType;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class AccountTest {

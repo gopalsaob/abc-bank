@@ -1,6 +1,5 @@
-package com.abc;
+package com.abc.account.transaction;
 
-import java.util.Calendar;
 import java.util.Date;
 
 public class Transaction {
