@@ -21,21 +21,21 @@ public class StatementBuilder implements AccountVisitor {
     }
 
     private String statementForAccount(Account account) {
-        StringBuilder statement = new StringBuilder(account.getAccountType().getName());
-        statement.append("\n");
-        double total = totalUpAllTransactions(account, statement);
-        statement.append("Total ");
-        statement.append(toDollars(total));
-        return statement.toString();
+        StringBuilder accountStatement = new StringBuilder(account.getAccountType().getName());
+        accountStatement.append("\n");
+        double accountTotal = totalUpAllTransactions(account, accountStatement);
+        accountStatement.append("Total ");
+        accountStatement.append(toDollars(accountTotal));
+        return accountStatement.toString();
     }
 
     private double totalUpAllTransactions(Account account, StringBuilder statement) {
-        double total = 0.0;
-        for (Transaction t : account.transactions) {
-            statement.append(String.format("  %s %s%n", (t.amount < 0 ? "withdrawal" : "deposit"), toDollars(t.amount)));
-            total += t.amount;
+        double accountTotal = 0.0;
+        for (Transaction t : account.getTransactions()) {
+            statement.append(String.format("  %s %s%n", t.getAmount() < 0 ? "withdrawal" : "deposit", toDollars(t.getAmount())));
+            accountTotal += t.getAmount();
         }
-        return total;
+        return accountTotal;
     }
 
     private String toDollars(double d){

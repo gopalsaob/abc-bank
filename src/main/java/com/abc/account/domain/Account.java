@@ -1,49 +1,46 @@
 package com.abc.account.domain;
 
-import com.abc.account.type.AccountType;
 import com.abc.account.transaction.Transaction;
+import com.abc.account.transaction.TransactionUtil;
+import com.abc.account.type.IAccountType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Account {
 
-    private final AccountType accountType;
-    public List<Transaction> transactions;
+    private final IAccountType accountType;
+    private final List<Transaction> transactions;
 
-    private Account(AccountType accountType) {
+    private Account(IAccountType accountType) {
         this.accountType = accountType;
         this.transactions = new ArrayList<Transaction>();
     }
 
     public void deposit(double amount) {
         validateAmountIsGreaterThanZero(amount);
-        transactions.add(new Transaction(amount));
+        transactions.add(Transaction.createImmediateTransaction(amount));
     }
 
     public void withdraw(double amount) {
         validateAmountIsGreaterThanZero(amount);
         validateAmountIsLessThanOrEqualToBalance(amount);
-        transactions.add(new Transaction(-amount));
+        transactions.add(Transaction.createImmediateTransaction(-amount));
     }
 
     public double interestEarned() {
-        double amount = sumTransactions();
-        return accountType.computeInterest(amount);
+        return accountType.computeInterest(new ArrayList<Transaction>(getTransactions()));
     }
 
     public double sumTransactions() {
-        double amount = 0.0;
-        for (Transaction t: transactions)
-            amount += t.amount;
-        return amount;
+        return new TransactionUtil().sumTransactions(transactions);
     }
 
-    public AccountType getAccountType() {
+    public IAccountType getAccountType() {
         return accountType;
     }
 
-    public static Account createAccount(AccountType accountType) {
+    public static Account createAccount(IAccountType accountType) {
         return new Account(accountType);
     }
 
@@ -59,5 +56,8 @@ public class Account {
         }
     }
 
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
 }
 
